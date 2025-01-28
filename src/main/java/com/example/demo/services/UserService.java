@@ -2,6 +2,8 @@ package com.example.demo.services;
 
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import com.example.demo.repository.UserRepository;
 @Service
 public class UserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     @Autowired
     private UserRepository userRepository;
 
@@ -43,7 +46,7 @@ public class UserService {
             throw new IllegalArgumentException("Nom d'utilisateur requis");
         }
 
-        System.out.println("Sauvegarde de l'utilisateur : " + userCreateModel);
+        logger.info("Création d'un nouvel utilisateur: {}", userCreateModel.getEmail());
         String encodedPassword = passwordEncoder.encode(userCreateModel.getPassword());
 
         Users newUser = new Users();

@@ -5,10 +5,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.entities.Message;
-import com.example.demo.repository.MessageRepository;
+import com.example.demo.services.MessageService;
+import com.example.demo.dto.MessageViewModel;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,8 +26,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 @Tag(name = "Messages", description = "API de gestion des messages")
 public class MessageController {
 
+    private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
+
+
     @Autowired
-    private MessageRepository messageRepository;
+    private MessageService messageService;
 
     @Operation(summary = "Créer un message", 
               description = "Envoie un nouveau message pour une location")
@@ -32,8 +39,8 @@ public class MessageController {
         @ApiResponse(responseCode = "400", description = "Données invalides")
     })
     @PostMapping
-    public ResponseEntity<Message> createMessage(@RequestBody Map<String, Object> payload) {
-        System.out.println("Received payload: " + payload);
+    public ResponseEntity<MessageViewModel> createMessage(@RequestBody Map<String, Object> payload) {
+        logger.info("Received payload: {}", payload);
 
         Message message = new Message();
         
@@ -52,17 +59,36 @@ public class MessageController {
         }
 
         message.setCreatedAt(new Date());
-        Message savedMessage = messageRepository.save(message);
-        return ResponseEntity.ok(savedMessage);
+        Message savedMessage = messageService.createMessage(message);
+
+        
+        MessageViewModel messageViewModel = new MessageViewModel(
+            savedMessage.getId(),
+            savedMessage.getRentalId(),
+            savedMessage.getUserId(),
+            savedMessage.getMessage(),
+            savedMessage.getCreatedAt().toString()
+        );
+
+        return ResponseEntity.ok(messageViewModel);
     }
 
     @Operation(summary = "Liste des messages d'une location", 
               description = "Récupère tous les messages associés à une location")
     @GetMapping("/rental/{rentalId}")
-    public ResponseEntity<List<Message>> getMessagesByRental(
+    public ResponseEntity<List<MessageViewModel>> getMessagesByRental(
         @Parameter(description = "ID de la location") @PathVariable Long rentalId
     ) {
-        List<Message> messages = messageRepository.findByRentalId(rentalId);
-        return ResponseEntity.ok(messages);
+        List<Message> messages = messageService.getMessagesByRentalId(rentalId);
+        List<MessageViewModel> messageViewModels = messages.stream()
+            .map(msg -> new MessageViewModel(
+                msg.getId(),
+                msg.getRentalId(),
+                msg.getUserId(),
+                msg.getMessage(),
+                msg.getCreatedAt().toString()
+            ))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(messageViewModels);
     }
 } 
