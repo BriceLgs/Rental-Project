@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -111,5 +112,23 @@ public class RentalService {
             log.error("Erreur lors de l'upload de l'image", e);
             throw new RuntimeException("Erreur lors de l'upload de l'image", e);
         }
+    }
+
+    public Rental updateRental(Long id, String name, Double surface, Double price, String description, MultipartFile image) {
+        Rental rental = rentalRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Location non trouvée avec l'ID : " + id));
+    
+        
+        rental.setName(name);
+        rental.setSurface(surface);
+        rental.setPrice(price);
+        rental.setDescription(description);
+        
+        if (image != null && !image.isEmpty()) {
+           
+        }
+    
+        
+        return rentalRepository.save(rental);
     }
 }

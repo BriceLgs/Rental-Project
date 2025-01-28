@@ -1,12 +1,15 @@
 package com.example.demo.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.services.RentalService;
 import java.util.List;
+import java.util.NoSuchElementException;
+
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.core.Authentication;
 
@@ -42,6 +45,26 @@ public class RentalController {
 			.map(ResponseEntity::ok)
 			.orElse(ResponseEntity.notFound().build());
 	}
+	@PutMapping("/{id}")
+public ResponseEntity<Rental> updateRental(
+    @PathVariable Long id,
+    @RequestParam("name") String name,
+    @RequestParam("surface") Double surface,
+    @RequestParam("price") Double price,
+    @RequestParam("description") String description,
+    @RequestParam(value = "picture", required = false) MultipartFile image
+) {
+    try {
+        Rental updatedRental = rentalService.updateRental(id, name, surface, price, description, image);
+        return ResponseEntity.ok(updatedRental);
+    } catch (NoSuchElementException e) {
+        log.error("Location non trouvée : {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    } catch (Exception e) {
+        log.error("Erreur lors de la mise à jour de la location", e);
+        return ResponseEntity.badRequest().build();
+    }
+}
 
 	@Operation(summary = "Créer une location", 
 			  description = "Crée une nouvelle location avec une image")
