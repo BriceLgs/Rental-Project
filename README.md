@@ -68,8 +68,8 @@ Utilisez le modèle suivant pour remplir le fichier `.env` :
 
 ```
 DATABASE_URL=jdbc:mysql://localhost:3306/rentalproject
-DATABASE_USERNAME=root
-DATABASE_PASSWORD=root
+DATABASE_USERNAME=your_username
+DATABASE_PASSWORD=your_password
 JWT_KEY=your_secret_key
 ```
 
