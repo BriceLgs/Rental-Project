@@ -78,6 +78,7 @@ Remplacez `your_username`, `your_password`, et `your_jwt_key` par vos informatio
 ## 3. Vérifier le Fichier `application.properties`
 
 Assurez-vous que le fichier `src/main/resources/application.properties` contient les lignes suivantes :
+```
 properties
 spring.datasource.name=rentalproject
 spring.datasource.url=${DATABASE_URL}
@@ -86,7 +87,7 @@ spring.datasource.password=${DATABASE_PASSWORD}
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 server.port=3001
 jwt.key=${JWT_KEY}
-
+```
 ## 4. Démarrer l'Application
 
 Compilez et exécutez l'application. Les tables nécessaires seront créées automatiquement dans la base de données si Hibernate est configuré correctement.
